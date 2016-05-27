@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-	
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
-	
-<BorderPane xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.polito.tdp.emergency.EmergencyController">
-	<!-- TODO Add Nodes -->
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+
+<BorderPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.65" fx:controller="it.polito.tdp.emergency.EmergencyController">
+   <top>
+      <Pane prefHeight="400.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+         <children>
+            <TextField fx:id="txtDottore" layoutX="175.0" layoutY="58.0" />
+            <Label layoutX="190.0" layoutY="14.0" text="Lab10_Emergency">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <TextField fx:id="txtOreSfalsamento" layoutX="176.0" layoutY="108.0" />
+            <Label layoutX="20.0" layoutY="62.0" text="Nome dottore:" />
+            <Label layoutX="20.0" layoutY="112.0" text="Ore di sfalsamento" />
+            <TextArea fx:id="txtRisultato" editable="false" layoutX="20.0" layoutY="186.0" prefHeight="200.0" prefWidth="460.0" />
+            <Button fx:id="btnAggiungiDottore" layoutX="372.0" layoutY="83.0" mnemonicParsing="false" onAction="#doAggiungiDottore" text="Aggiungi dottore" />
+            <Button fx:id="btnSimula" layoutX="223.0" layoutY="151.0" mnemonicParsing="false" onAction="#doSimula" text="Simula" />
+         </children>
+      </Pane>
+   </top>
 </BorderPane>

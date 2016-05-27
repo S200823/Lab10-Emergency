@@ -12,26 +12,29 @@
 
 package it.polito.tdp.emergency.simulation;
 
+import java.time.LocalDateTime;
+
 public class Evento implements Comparable<Evento> {
 
-	public int getDato() {
-		return dato;
+	public Paziente getPaziente() {
+		return paziente;
 	}
 
 	@Override
 	public String toString() {
-		return "Evento [tempo=" + tempo + ", tipo=" + tipo + ", dato=" + dato + "]";
+		return "Evento [tempo=" + tempo + ", tipo=" + tipo + ", paziente=" + paziente.getName() + " - "
+				+ paziente.getStato() + "]";
 	}
 
 	public enum TipoEvento {
 		PAZIENTE_ARRIVA, PAZIENTE_GUARISCE, PAZIENTE_MUORE
 	}
 
-	protected long tempo;
+	protected LocalDateTime tempo;
 	protected TipoEvento tipo;
-	protected int dato;
+	protected Paziente paziente;
 
-	public long getTempo() {
+	public LocalDateTime getTempo() {
 		return tempo;
 	}
 
@@ -39,16 +42,16 @@ public class Evento implements Comparable<Evento> {
 		return tipo;
 	}
 
-	public Evento(long time, TipoEvento type, int dato) {
+	public Evento(LocalDateTime time, TipoEvento type, Paziente paziente) {
 		super();
 		this.tempo = time;
 		this.tipo = type;
-		this.dato = dato;
+		this.paziente = paziente;
 	}
 
 	@Override
 	public int compareTo(Evento arg0) {
-		return Long.compare(this.tempo, arg0.tempo);
+		return this.tempo.compareTo(arg0.tempo);
 	}
 
 }

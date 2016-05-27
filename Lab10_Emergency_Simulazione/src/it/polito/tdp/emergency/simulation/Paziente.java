@@ -13,12 +13,24 @@
 package it.polito.tdp.emergency.simulation;
 
 public class Paziente implements Comparable<Paziente> {
+
 	public enum StatoPaziente {
 		ROSSO, GIALLO, VERDE, BIANCO, IN_CURA, SALVO, NERO
 	};
 
 	private int id;
+	private String name;
+
 	private StatoPaziente stato;
+
+	public Paziente(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
+
+	public Paziente(int id) {
+		this.id = id;
+	}
 
 	@Override
 	public int hashCode() {
@@ -43,23 +55,45 @@ public class Paziente implements Comparable<Paziente> {
 		return stato;
 	}
 
-	public void setStato(StatoPaziente stato) {
-		this.stato = stato;
+	public void setStato(String triage) {
+		// valueOf() would have been simpler, but CaSe SeNsItIvE
+		if(triage.compareToIgnoreCase("Black")==0)
+			this.stato = StatoPaziente.NERO;
+		else if(triage.compareToIgnoreCase("Red")==0)
+			this.stato = StatoPaziente.ROSSO;
+		else if(triage.compareToIgnoreCase("Yellow")==0)
+			this.stato = StatoPaziente.GIALLO;
+		else if(triage.compareToIgnoreCase("Green")==0)
+			this.stato = StatoPaziente.VERDE;
+		else if(triage.compareToIgnoreCase("White")==0)
+			this.stato = StatoPaziente.BIANCO;
+		else if(triage.compareToIgnoreCase("In_cura")==0)
+			this.stato = StatoPaziente.IN_CURA;
+		else if(triage.compareToIgnoreCase("Salvo")==0)
+			this.stato = StatoPaziente.SALVO;
+		else
+			throw new ClassCastException("Unknown triage: \"" + triage + "\"");
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	@Override
-	public String toString() {
-		return "Paziente [id=" + id + ", stato=" + stato + "]";
+	public String getName() {
+		return name;
 	}
 
-	public Paziente(int id, StatoPaziente stato) {
-		super();
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public void setId(int id) {
 		this.id = id;
-		this.stato = stato;
+	}
+
+	@Override
+	public String toString() {
+		return "Paziente [nome=" + name + ", stato=" + stato + "]";
 	}
 
 	@Override

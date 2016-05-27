@@ -28,6 +28,7 @@ public class Core {
 
 	int pazientiSalvati = 0;
 	int pazientiPersi = 0;
+	String textOut = "";
 
 	Queue<Evento> listaEventi = new PriorityQueue<Evento>();
 	Map<Integer, Paziente> pazienti = new HashMap<Integer, Paziente>();
@@ -50,77 +51,76 @@ public class Core {
 		pazienti.put(p.getId(), p);
 	}
 
-	public void passo() {
-		Evento e = listaEventi.remove();
-		switch (e.getTipo()) {
-		case PAZIENTE_ARRIVA:
-			System.out.println("Arrivo paziente:" + e);
-			pazientiInAttesa.add(pazienti.get(e.getDato()));
-			switch (pazienti.get(e.getDato()).getStato()) {
-			case BIANCO:
+	public String simula() {
+		textOut += "***** INIZIO SIMULAZIONE *****\n";
+		while (!listaEventi.isEmpty()) {
+			Evento e = listaEventi.remove();
+			switch (e.getTipo()) {
+			case PAZIENTE_ARRIVA:
+				textOut += "\n\tArrivo paziente:  " + e;
+				pazientiInAttesa.add(e.getPaziente());
+				switch (e.getPaziente().getStato()) {
+				case BIANCO:
+					break;
+				case GIALLO:
+					if (isMedicoDisponibile()) {
+						textOut += "\n\tInizio cura:          " + e;
+						this.aggiungiEvento(new Evento(e.getTempo().plusMinutes(30),
+								Evento.TipoEvento.PAZIENTE_GUARISCE, e.getPaziente()));
+						mediciDisponibili--;
+					} else
+						this.aggiungiEvento(new Evento(e.getTempo().plusHours(6), Evento.TipoEvento.PAZIENTE_MUORE,
+								e.getPaziente()));
+					break;
+				case ROSSO:
+					if (isMedicoDisponibile()) {
+						textOut += "\n\tInizio cura:          " + e;
+						this.aggiungiEvento(new Evento(e.getTempo().plusMinutes(30),
+								Evento.TipoEvento.PAZIENTE_GUARISCE, e.getPaziente()));
+						mediciDisponibili--;
+					} else
+						this.aggiungiEvento(new Evento(e.getTempo().plusHours(1), Evento.TipoEvento.PAZIENTE_MUORE,
+								e.getPaziente()));
+					break;
+				case VERDE:
+					if (isMedicoDisponibile()) {
+						textOut += "\n\tInizio cura:          " + e;
+						this.aggiungiEvento(new Evento(e.getTempo().plusMinutes(30),
+								Evento.TipoEvento.PAZIENTE_GUARISCE, e.getPaziente()));
+						mediciDisponibili--;
+					} else
+						this.aggiungiEvento(new Evento(e.getTempo().plusHours(12), Evento.TipoEvento.PAZIENTE_MUORE,
+								e.getPaziente()));
+					break;
+				default:
+					System.err.println("Panik!");
+				}
 				break;
-			case GIALLO:
-				this.aggiungiEvento(new Evento(e.getTempo() + 6 * 60, Evento.TipoEvento.PAZIENTE_MUORE, e.getDato()));
+			case PAZIENTE_GUARISCE:
+					textOut += "\n\tPaziente salvato: " + e;
+					e.getPaziente().setStato("Salvo");
+					mediciDisponibili++;
+					pazientiSalvati++;
 				break;
-			case ROSSO:
-				this.aggiungiEvento(new Evento(e.getTempo() + 1 * 60, Evento.TipoEvento.PAZIENTE_MUORE, e.getDato()));
-				break;
-			case VERDE:
-				this.aggiungiEvento(new Evento(e.getTempo() + 12 * 60, Evento.TipoEvento.PAZIENTE_MUORE, e.getDato()));
+			case PAZIENTE_MUORE:
+					pazientiPersi++;
+					e.getPaziente().setStato("Black");
+					textOut += "\n\tPaziente morto:  " + e;
 				break;
 			default:
 				System.err.println("Panik!");
 			}
-			break;
-		case PAZIENTE_GUARISCE:
-			if (pazienti.get(e.getDato()).getStato() != Paziente.StatoPaziente.NERO) {
-				System.out.println("Paziente salvato: " + e);
-				pazienti.get(e.getDato()).setStato(Paziente.StatoPaziente.SALVO);
-				++mediciDisponibili;
-				++pazientiSalvati;
-			}
-			break;
-		case PAZIENTE_MUORE:
-			if (pazienti.get(e.getDato()).getStato() == Paziente.StatoPaziente.SALVO) {
-				System.out.println("Paziente gi� salvato: " + e);
-			} else {
-				++pazientiPersi;
-				pazienti.get(e.getDato()).setStato(Paziente.StatoPaziente.NERO);
-				System.out.println("Paziente morto: " + e);
-				if (pazienti.get(e.getDato()).getStato() == Paziente.StatoPaziente.IN_CURA) {
-					++mediciDisponibili;
-				}
-			}
-			break;
-		default:
-			System.err.println("Panik!");
 		}
-
-		while (cura(e.getTempo()))
-			;
+		textOut += "\n\n***** FINE SIMULAZIONE *****\n";
+		textOut += "\n\tPazienti salvati: " + pazientiSalvati + ";";
+		textOut += "\n\tPazienti persi: " + pazientiPersi + ".";
+		return textOut;
 	}
 
-	protected boolean cura(long adesso) {
-		if (pazientiInAttesa.isEmpty())
+	private boolean isMedicoDisponibile() {
+		if (mediciDisponibili > 0)
+			return true;
+		else
 			return false;
-		if (mediciDisponibili == 0)
-			return false;
-
-		Paziente p = pazientiInAttesa.remove();
-		if (p.getStato() != Paziente.StatoPaziente.NERO) {
-			--mediciDisponibili;
-			pazienti.get(p.getId()).setStato(Paziente.StatoPaziente.IN_CURA);
-			aggiungiEvento(new Evento(adesso + 30, Evento.TipoEvento.PAZIENTE_GUARISCE, p.getId()));
-			System.out.println("Inizio a curare: " + p);
-		}
-
-		return true;
 	}
-
-	public void simula() {
-		while (!listaEventi.isEmpty()) {
-			passo();
-		}
-	}
-
 }

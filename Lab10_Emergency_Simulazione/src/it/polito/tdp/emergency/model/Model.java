@@ -1,32 +1,42 @@
 package it.polito.tdp.emergency.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import it.polito.tdp.emergency.db.FieldHospitalDAO;
+import it.polito.tdp.emergency.simulation.Arrivo;
 import it.polito.tdp.emergency.simulation.Core;
+import it.polito.tdp.emergency.simulation.Dottore;
 import it.polito.tdp.emergency.simulation.Evento;
 import it.polito.tdp.emergency.simulation.Paziente;
 
 public class Model {
 
-	Core simulatore;
+	Core simulatore = new Core();
+	FieldHospitalDAO dao;
+	List<Paziente> pazienti;
+	List<Arrivo> arrivi;
+	List<Dottore> dottori;
 
-	protected void stub() {
-		simulatore = new Core();
-
-		simulatore.setMediciDisponibili(1);
-
-		simulatore.aggiungiPaziente(new Paziente(1, Paziente.StatoPaziente.ROSSO));
-		simulatore.aggiungiPaziente(new Paziente(2, Paziente.StatoPaziente.ROSSO));
-		simulatore.aggiungiPaziente(new Paziente(3, Paziente.StatoPaziente.ROSSO));
-		simulatore.aggiungiPaziente(new Paziente(4, Paziente.StatoPaziente.ROSSO));
-
-		simulatore.aggiungiEvento(new Evento(10, Evento.TipoEvento.PAZIENTE_ARRIVA, 1));
-		simulatore.aggiungiEvento(new Evento(11, Evento.TipoEvento.PAZIENTE_ARRIVA, 2));
-		simulatore.aggiungiEvento(new Evento(12, Evento.TipoEvento.PAZIENTE_ARRIVA, 3));
-		simulatore.aggiungiEvento(new Evento(13, Evento.TipoEvento.PAZIENTE_ARRIVA, 4));
-
-		simulatore.simula();
-
-		System.err.println("Persi:" + simulatore.getPazientiPersi());
-		System.err.println("Salvati:" + simulatore.getPazientiSalvati());
+	public Model() {
+		dao = new FieldHospitalDAO();
+		pazienti = dao.getAllPazienti();
+		arrivi = dao.getAllArrivals(pazienti);
+		dottori = new ArrayList<Dottore>();
 	}
 
+	public void addDottore(String nomeDottore, int oreSfalsamento) {
+		Dottore dottore = new Dottore(nomeDottore, oreSfalsamento, null);
+		System.out.println(dottore);
+		dottori.add(dottore);
+	}
+
+	public String simula() {
+		simulatore.setMediciDisponibili(8);
+		for (Paziente p : pazienti)
+			simulatore.aggiungiPaziente(p);
+		for (Arrivo a : arrivi)
+			simulatore.aggiungiEvento(new Evento(a.getTime(), Evento.TipoEvento.PAZIENTE_ARRIVA, a.getPaziente()));
+		return simulatore.simula();
+	}
 }
